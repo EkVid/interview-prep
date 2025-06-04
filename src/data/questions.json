@@ -1,0 +1,92 @@
+{
+    "questions": [
+        {
+            "id": "1",
+            "title": "Two Sum",
+            "description": "Given an array of integers nums and an integer target, return indices of the two numbers in the array that add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
+            "difficulty": "Easy",
+            "position": "Software Engineer",
+            "type": "New Grad",
+            "time": "Sep 2024",
+            "tags": [
+                "Array",
+                "Hash Table",
+                "Programming"
+            ],
+            "solution": "function twoSum(nums: number[], target: number): number[] {\n    const map = new Map();\n    \n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    \n    return [];\n}",
+            "isProgramming": true,
+            "programmingLanguage": "typescript",
+            "company": "Google",
+            "estimatedTime": "15-20 min"
+        },
+        {
+            "id": "2",
+            "title": "System Design: URL Shortener",
+            "description": "Design a URL shortening service like bit.ly. The service should take a long URL and return a shortened version, and when users access the short URL, they should be redirected to the original URL.",
+            "difficulty": "Medium",
+            "position": "Software Engineer Intern",
+            "type": "Intern",
+            "time": "Summer 2024",
+            "tags": [
+                "System Design",
+                "Distributed Systems",
+                "Database"
+            ],
+            "solution": "Key Components:\n1. API Gateway\n   - Handle incoming requests for URL shortening and redirection\n\n2. URL Shortening Service\n   - Generate unique short URLs using base62 encoding\n   - Store mapping in database\n   - Handle collisions\n\n3. Database\n   - Primary: NoSQL (e.g., DynamoDB)\n   - Cache: Redis for fast lookups\n\n4. Load Balancer\n   - Distribute traffic across multiple servers\n\nCapacity Estimation:\n- Read-heavy system (100:1 read/write ratio)\n- 100M URLs/month = ~40 URLs/second\n- Storage: ~500 bytes per URL pair = ~500GB/month\n\nScale Considerations:\n- Horizontal scaling for API servers\n- Database sharding by URL hash\n- CDN for popular URLs\n- Rate limiting to prevent abuse",
+            "isProgramming": false,
+            "company": "Microsoft",
+            "estimatedTime": "45-60 min"
+        },
+        {
+            "id": "3",
+            "title": "Rectangle Point Validation",
+            "description": "Given a list of coordinates (points), write code to check if all of these points would fall into a rectangle. The rectangle can be of any size and orientation, but its sides must be parallel to the coordinate axes.",
+            "difficulty": "Medium",
+            "position": "Backend Developer Intern",
+            "type": "Intern",
+            "time": "Fall 2025",
+            "tags": [
+                "Array",
+                "Geometry",
+                "Programming"
+            ],
+            "solution": "struct Point {\n    int x;\n    int y;\n};\n\nbool solution(vector<Point> points) {\n    int maxx = 0, minx = INT_MAX;\n    int maxy = 0, miny = INT_MAX;\n    \n    // Find the bounding box\n    for(auto pt: points) {\n        maxx = max(maxx, pt.x);\n        minx = min(minx, pt.x);\n        maxy = max(maxy, pt.y);\n        miny = min(miny, pt.y);\n    }\n    \n    // Check if each point lies on the perimeter of the bounding box\n    for(auto pt: points) {\n        if(pt.x != maxx && pt.x != minx && pt.y != maxy && pt.y != miny)\n            return false;\n    }\n    \n    return true;\n}",
+            "isProgramming": true,
+            "programmingLanguage": "cpp",
+            "company": "SOTI",
+            "estimatedTime": "20-25 min",
+            "testCases": [
+                {
+                    "input": "{[0, 1], [0, 2], [1, 1]}",
+                    "output": "true",
+                    "explanation": "We can have a rectangle with points (0, 0), (1, 0), (1, 2), (0, 2). This rectangle includes all of the points."
+                },
+                {
+                    "input": "{[1, 1], [2, 2], [3, 3], [4, 4]}",
+                    "output": "false",
+                    "explanation": "It is impossible to include all of the points in a single rectangle, in this case, at most 2 points could be covered."
+                }
+            ]
+        },
+        {
+            "id": "4",
+            "title": "Task Management System Design",
+            "description": "Design and implement a task management system that can efficiently handle task operations including adding tasks, removing tasks, and retrieving the highest priority task. Each task has a name, priority, and initialization date. When two tasks have the same priority, the one with an earlier timestamp should be considered higher priority.",
+            "difficulty": "Medium",
+            "position": "Backend Developer Intern",
+            "type": "Intern",
+            "time": "Fall 2025",
+            "tags": [
+                "System Design",
+                "Data Structures",
+                "Binary Search Tree"
+            ],
+            "solution": "// Task class definition\nclass Task {\n    String name;\n    int priority;\n    Date initDate;\n}\n\n// Optimal implementation using Binary Search Tree\nclass TaskManagement {\n    private TreeMap<Integer, PriorityQueue<Task>> priorityTree;  // BST with priority queues for same-priority tasks\n    \n    public TaskManagement() {\n        priorityTree = new TreeMap<>(Collections.reverseOrder());  // Reverse order for highest priority first\n    }\n    \n    // O(log N) time complexity\n    public void addTask(Task task) {\n        priorityTree.computeIfAbsent(task.priority, k -> new PriorityQueue<>((a, b) -> \n            a.initDate.compareTo(b.initDate))).add(task);\n    }\n    \n    // O(log N) time complexity\n    public void removeTask(Task task) {\n        PriorityQueue<Task> tasks = priorityTree.get(task.priority);\n        if (tasks != null) {\n            tasks.remove(task);\n            if (tasks.isEmpty()) {\n                priorityTree.remove(task.priority);\n            }\n        }\n    }\n    \n    // O(log N) time complexity\n    public Task getHighestPriorityTask() {\n        if (priorityTree.isEmpty()) return null;\n        \n        Map.Entry<Integer, PriorityQueue<Task>> highestEntry = priorityTree.firstEntry();\n        PriorityQueue<Task> tasks = highestEntry.getValue();\n        Task task = tasks.poll();\n        \n        if (tasks.isEmpty()) {\n            priorityTree.remove(highestEntry.getKey());\n        }\n        \n        return task;\n    }\n}",
+            "isProgramming": true,
+            "programmingLanguage": "java",
+            "company": "SOTI",
+            "estimatedTime": "35-40 min",
+            "explanation": "Implementation Details:\n1. Uses TreeMap (Red-Black BST) for priority management\n2. PriorityQueue for handling same-priority tasks based on timestamp\n3. All operations maintain O(log N) time complexity\n4. Handles edge cases like empty structure and duplicate priorities\n\nNote on HashMap O(1) Time Complexity:\n- HashMaps achieve O(1) through clever use of hash functions\n- Hash function converts key to array index\n- Good hash function distributes keys uniformly\n- Uses techniques like chaining or open addressing for collision resolution"
+        }
+    ]
+}

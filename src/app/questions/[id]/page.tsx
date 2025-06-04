@@ -6,6 +6,7 @@ import { FiArrowLeft, FiTag, FiClock, FiBarChart2, FiStar, FiShare2, FiBookmark 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Navbar from '@/components/Navbar';
+import questionsData from '@/data/questions.json';
 
 interface TestCase {
     input: string;
@@ -34,162 +35,16 @@ interface Question {
     type?: string;
 }
 
-// This would normally come from an API/database
+// Get question data from the JSON file
 const getQuestionData = (id: string): Question | null => {
-    const questions: Record<string, Question> = {
-        '1': {
-            id: '1',
-            title: 'Two Sum',
-            description: 'Given an array of integers nums and an integer target, return indices of the two numbers in the array that add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.',
-            difficulty: 'Easy',
-            tags: ['Array', 'Hash Table', 'Programming'],
-            solution: `function twoSum(nums: number[], target: number): number[] {
-    const map = new Map();
-    
-    for (let i = 0; i < nums.length; i++) {
-        const complement = target - nums[i];
-        if (map.has(complement)) {
-            return [map.get(complement), i];
-        }
-        map.set(nums[i], i);
-    }
-    
-    return [];
-}`,
-            explanation: `This solution uses a hash map to achieve O(n) time complexity:
+    const question = questionsData.questions.find(q => q.id === id);
+    if (!question) return null;
 
-1. We iterate through the array once, for each number:
-   - Calculate its complement (target - current number)
-   - Check if the complement exists in our map
-   - If found, we've found our pair
-   - If not, add current number to map
-
-2. Space complexity is O(n) to store the hash map
-3. Time complexity is O(n) as we only need one pass
-
-Example:
-nums = [2, 7, 11, 15], target = 9
-
-1. i = 0: num = 2
-   - complement = 9 - 2 = 7
-   - map is empty, add 2 -> 0
-2. i = 1: num = 7
-   - complement = 9 - 7 = 2
-   - 2 exists in map! Return [0, 1]`,
-            testCases: [
-                {
-                    input: 'nums = [2,7,11,15], target = 9',
-                    output: '[0,1]',
-                    explanation: 'nums[0] + nums[1] = 2 + 7 = 9'
-                },
-                {
-                    input: 'nums = [3,2,4], target = 6',
-                    output: '[1,2]',
-                    explanation: 'nums[1] + nums[2] = 2 + 4 = 6'
-                }
-            ],
-            isProgramming: true,
-            programmingLanguage: 'typescript',
-            company: 'Google',
-            estimatedTime: '15-20 min',
-            relatedTopics: ['Hash Table', 'Array', 'Two Pointers'],
-            timeComplexity: 'O(n)',
-            spaceComplexity: 'O(n)'
-        },
-        '2': {
-            id: '2',
-            title: 'System Design: URL Shortener',
-            description: 'Design a URL shortening service like bit.ly. The service should take a long URL and return a shortened version, and when users access the short URL, they should be redirected to the original URL.',
-            difficulty: 'Medium' as const,
-            tags: ['System Design', 'Distributed Systems', 'Database'],
-            solution: `Key Components:
-1. API Gateway
-   - Handle incoming requests for URL shortening and redirection
-
-2. URL Shortening Service
-   - Generate unique short URLs using base62 encoding
-   - Store mapping in database
-   - Handle collisions
-
-3. Database
-   - Primary: NoSQL (e.g., DynamoDB)
-   - Cache: Redis for fast lookups
-
-4. Load Balancer
-   - Distribute traffic across multiple servers`,
-            explanation: `Detailed System Design Approach:
-
-1. Requirements Analysis:
-   - Functional Requirements:
-     * Shorten long URLs
-     * Redirect to original URL
-     * Custom short URLs (optional)
-     * Analytics (optional)
-   
-   - Non-Functional Requirements:
-     * Highly available
-     * Minimal latency
-     * URL shouldn't be guessable
-     * Scalable
-
-2. Capacity Estimation:
-   - Read-heavy system (100:1 read/write ratio)
-   - 100M URLs/month = ~40 URLs/second
-   - Storage: ~500 bytes per URL pair = ~500GB/month
-   
-3. System API:
-   \`\`\`typescript
-   createShortUrl(api_dev_key: string, original_url: string, custom_alias?: string): string
-   getOriginalUrl(short_url: string): string
-   \`\`\`
-
-4. Database Design:
-   \`\`\`sql
-   URLs {
-     id: bigint,
-     short_key: varchar(8),
-     original_url: varchar(512),
-     user_id: bigint,
-     created_at: timestamp,
-     expires_at: timestamp
-   }
-   \`\`\`
-
-5. Detailed Component Design:
-   a) URL Encoding:
-      - Base62 encoding ([a-zA-Z0-9])
-      - 6 characters = 62^6 ≈ 57B possibilities
-   
-   b) Cache:
-      - Redis with LRU eviction
-      - Cache frequently accessed URLs
-   
-   c) Load Balancer:
-      - Round-robin for API servers
-      - Consistent hashing for cache servers
-
-6. Scale Considerations:
-   - Database sharding by URL hash
-   - CDN for popular URLs
-   - Rate limiting
-   - Analytics service (optional)`,
-            testCases: [
-                {
-                    input: 'original_url = "https://www.example.com/very/long/path"',
-                    output: 'short_url = "http://short.url/aB3x9Y"',
-                    explanation: 'Converts long URL to short 6-character key'
-                }
-            ],
-            isProgramming: false,
-            company: 'Microsoft',
-            estimatedTime: '45-60 min',
-            relatedTopics: ['Distributed Systems', 'Caching', 'Load Balancing'],
-            timeComplexity: 'O(1) for lookups',
-            spaceComplexity: 'O(n) where n is number of URLs'
-        }
+    // Type assertion to ensure the question matches our interface
+    return {
+        ...question,
+        difficulty: question.difficulty as 'Easy' | 'Medium' | 'Hard'
     };
-
-    return questions[id] || null;
 };
 
 export default function QuestionDetailPage() {
