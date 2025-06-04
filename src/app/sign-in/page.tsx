@@ -13,7 +13,13 @@ export default function SignInPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const sharedPassword = 'test';
+        const sharedPassword = process.env.NEXT_PUBLIC_APP_PASSWORD;
+        console.log('Password from env:', sharedPassword);
+
+        if (!sharedPassword) {
+            setError('System error: Password not configured. Please contact the administrator.');
+            return;
+        }
 
         if (password !== sharedPassword) {
             setError('Invalid password. Please contact the administrator.');
