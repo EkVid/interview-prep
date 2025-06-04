@@ -154,7 +154,7 @@ export default function Navbar({ isHome = false, isDashboard = false, isSignUp =
                     </div>
 
                     {/* Mobile Menu Button */}
-                    {(!isSignUp && !isLogin) && (
+                    {(!isSignUp || !isLogin) && (
                         <div className="flex items-center md:hidden">
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
