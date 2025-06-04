@@ -18,7 +18,7 @@ export default function CreateAccountPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
-            <Navbar />
+            <Navbar isSignUp={true} />
 
             <div className="flex min-h-screen -mt-16 items-center justify-center px-4 sm:px-6 lg:px-8">
                 <motion.div

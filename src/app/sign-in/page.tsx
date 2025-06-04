@@ -4,14 +4,16 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiLock, FiMail, FiCode } from 'react-icons/fi';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 
 export default function SignInPage() {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const sharedPassword = process.env.NEXT_PUBLIC_APP_PASSWORD;
         console.log('Password from env:', sharedPassword);
@@ -26,12 +28,16 @@ export default function SignInPage() {
             return;
         }
 
-        window.location.href = '/dashboard';
+        // Set authentication cookie
+        document.cookie = 'isAuthenticated=true; path=/; max-age=86400'; // 24 hours
+
+        // Redirect to dashboard
+        router.push('/dashboard');
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
-            <Navbar />
+            <Navbar isLogin={true} />
 
             <div className="flex min-h-screen -mt-16 items-center justify-center px-4 sm:px-6 lg:px-8">
                 <motion.div
