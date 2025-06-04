@@ -13,7 +13,7 @@ const convertQuestion = (question: any) => ({
 export default function QuestionsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
-            <Navbar />
+            <Navbar isDashboard={true}/>
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
                 <div className="space-y-8">
