@@ -16,7 +16,6 @@ export default function SignInPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const sharedPassword = process.env.NEXT_PUBLIC_APP_PASSWORD;
-        console.log('Password from env:', sharedPassword);
 
         if (!sharedPassword) {
             setError('System error: Password not configured. Please contact the administrator.');
