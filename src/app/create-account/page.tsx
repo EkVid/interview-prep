@@ -5,15 +5,29 @@ import { motion } from 'framer-motion';
 import { FiMail, FiUser, FiCode } from 'react-icons/fi';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import { registerUser } from '@/utils/api';
+import { useRouter } from 'next/navigation';
 
 export default function CreateAccountPage() {
+    const router = useRouter();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        window.location.href = '/sign-in';
+        try{
+            const res = await registerUser(username, email);
+
+            if(res.success){
+                router.push('/sign-in');
+                return;
+            } else {
+                setError(res.message || 'Registration failed. Please try again.');
+            }
+        } catch (error){
+            setError('An error occurred while creating your account. Please try again later.');
+        }
     };
 
     return (

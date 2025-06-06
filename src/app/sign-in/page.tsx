@@ -6,6 +6,7 @@ import { FiLock, FiMail, FiCode } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import { loginUser } from '@/utils/api';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -15,23 +16,20 @@ export default function SignInPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const sharedPassword = process.env.NEXT_PUBLIC_APP_PASSWORD;
+        try{
+            const res = await loginUser(email, password);
 
-        if (!sharedPassword) {
-            setError('System error: Password not configured. Please contact the administrator.');
-            return;
+            if(res.success){
+                // If login is successful, set authentication cookie and redirect
+                document.cookie = 'isAuthenticated=true; path=/; max-age=86400'; // 24 hours
+                router.push('/dashboard');
+                return;
+            } else {
+                setError(res.message || 'Login failed. Please try again.');
+            }
+        } catch(error){
+            setError('An error occurred while logging in. Please try again later.');
         }
-
-        if (password !== sharedPassword) {
-            setError('Invalid password. Please contact the administrator.');
-            return;
-        }
-
-        // Set authentication cookie
-        document.cookie = 'isAuthenticated=true; path=/; max-age=86400'; // 24 hours
-
-        // Redirect to dashboard
-        router.push('/dashboard');
     };
 
     return (
