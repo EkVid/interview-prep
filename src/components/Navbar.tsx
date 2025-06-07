@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { FiMenu, FiX, FiLogOut } from 'react-icons/fi';
+import { logoutUser } from '@/utils/api';
 
 interface NavbarProps {
     isHome?: boolean;
@@ -25,12 +26,23 @@ export default function Navbar({ isHome = false, isDashboard = false, isSignUp =
         setIsAuthenticated(document.cookie.includes('isAuthenticated=true'));
     }, []);
 
-    const handleSignOut = () => {
-        // Remove authentication cookie
-        document.cookie = 'isAuthenticated=true; path=/; max-age=0';
-        // Redirect to home page
-        router.push('/');
-    };
+    const handleSignOut = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try{
+            const res = await logoutUser();
+
+            if(res.success){
+                // Remove authentication cookie
+                document.cookie = 'isAuthenticated=true; path=/; max-age=0';
+                // Redirect to home page
+                router.push('/');
+            } else {
+                alert("Failed to sign out. Please try again.");
+            }
+        } catch(error){
+            alert("An error occurred while signing out. Please try again later.");
+        };
+    }
 
     const scrollToSection = (id: string) => {
         if (!isHomePage) {

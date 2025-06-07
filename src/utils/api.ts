@@ -26,3 +26,12 @@ export async function loginUser(email: String, password: String){
     return res.json();
 }
 
+// logout
+export async function logoutUser(){
+    const res = await fetch(`${BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include', // include cookies for session management
+    });
+
+    return res.json();
+}
