@@ -61,6 +61,7 @@ export async function postQuestion(question: Question){
         headers: {
             contentType: 'application/json'
         },
+        body: JSON.stringify({question})
     })
     return res.json();
 }
