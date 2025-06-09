@@ -1,12 +1,14 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiTag, FiClock, FiBarChart2, FiStar, FiShare2, FiBookmark } from 'react-icons/fi';
+import { FiArrowLeft, FiTag, FiClock, FiBarChart2, FiShare2, FiBookmark } from 'react-icons/fi';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Navbar from '@/components/Navbar';
-import questionsData from '@/data/questions.json';
+// import questionsData from '@/data/questions.json';
+import { getQuestionById } from '@/utils/api';
 
 interface TestCase {
     input: string;
@@ -35,33 +37,66 @@ interface Question {
     type?: string;
 }
 
-// Get question data from the JSON file
-const getQuestionData = (id: string): Question | null => {
-    const question = questionsData.questions.find(q => q.id === id);
-    if (!question) return null;
-
-    // Type assertion to ensure the question matches our interface
-    return {
-        ...question,
-        difficulty: question.difficulty as 'Easy' | 'Medium' | 'Hard'
-    };
-};
 
 export default function QuestionDetailPage() {
     const params = useParams();
     const id = typeof params.id === 'string' ? params.id : '';
-    const question = getQuestionData(id);
 
-    if (!question) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
-                <Navbar />
-                <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-                    <h1 className="text-2xl font-bold text-gray-900">Question not found</h1>
-                </main>
-            </div>
-        );
-    }
+    const [question, setQuestion] = useState<Question | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchQuestionById(id: string){
+            setLoading(true);
+            setError(null);
+            try{
+                const data = await getQuestionById(id);
+                if (!data) {
+                    setError('Question not found');
+                    setQuestion(null);
+                }
+                else{
+                    const typedQuestion = {
+                        ...data,
+                        difficulty: data.difficulty as 'Easy' | 'Medium' | 'Hard',
+                        tags: typeof data.tags === 'string'
+                        ? data.tags.split(',').map((tag: string) => tag.trim())
+                        : data.tags || [],
+                    };
+                    setQuestion(typedQuestion);                  
+                }
+            } catch (err){
+                setError('Failed to load question detail');
+                setQuestion(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if(id){
+            fetchQuestionById(id);
+        } else {
+            setError('Invalid question ID');
+            setLoading(false);
+        }
+
+    }, [id]);
+
+      // todo: create a loading page
+      if (loading) return <div>Loading questions...</div>;
+
+      if (!question || error) {
+         return (
+             <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
+                 <Navbar />
+                 <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+                     <h1 className="text-2xl font-bold text-gray-900">Question not found</h1>
+                 </main>
+             </div>
+         );
+     }
+
 
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty.toLowerCase()) {

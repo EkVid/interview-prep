@@ -2,15 +2,47 @@
 
 import Question from '@/components/Question';
 import Navbar from '@/components/Navbar';
-import questionsData from '@/data/questions.json';
+import { getAllQuestions } from '@/utils/api';
+import { useEffect, useState } from 'react';
 
-// Convert the difficulty string to the correct type
+// use this for json data
+// import questionsData from '@/data/questions.json';
+
+// Convert the difficulty and tags strings to the correct type
 const convertQuestion = (question: any) => ({
     ...question,
-    difficulty: question.difficulty as 'Easy' | 'Medium' | 'Hard'
-});
+    difficulty: question.difficulty as 'Easy' | 'Medium' | 'Hard',
+    tags: typeof question.tags === 'string' 
+    ? question.tags.split(',').map((tag: string) => tag.trim()) 
+    : question.tags || []});
+
 
 export default function QuestionsPage() {
+    const [questionsData, setQuestionsData] = useState<{ questions: any[] }>({ questions: [] });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchQuestions(){
+            try{
+                const data = await getAllQuestions();
+                setQuestionsData({questions : data});
+            } catch (err){
+                setError("Failed to load questions");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchQuestions();
+    }, [])
+
+
+    // todo: create a loading and error pages
+    if (loading) return <div>Loading questions...</div>;
+    if (error) return <div>{error}</div>;
+
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
             <Navbar isDashboard={true}/>
@@ -24,7 +56,7 @@ export default function QuestionsPage() {
 
                     <div className="space-y-6">
                         {questionsData.questions.map((question) => (
-                            <Question key={question.id} {...convertQuestion(question)} />
+                            <Question key={question.id ?? question.title} {...convertQuestion(question)} />
                         ))}
                     </div>
                 </div>
